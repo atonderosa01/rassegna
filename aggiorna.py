@@ -78,6 +78,9 @@ def pulisci_link(link: str) -> str | None:
     parti = urllib.parse.urlsplit(link)
     if parti.scheme not in ("http", "https") or not parti.netloc:
         return None
+    # Il feed di Libero pubblica anche voci rotte, con link ".../undefined/" che danno 404.
+    if re.search(r"/(undefined|null)(/|$)", parti.path):
+        return None
     query = [(k, v) for k, v in urllib.parse.parse_qsl(parti.query, keep_blank_values=True)
              if not PARAMETRI_TRACCIAMENTO.match(k)]
     return urllib.parse.urlunsplit((parti.scheme, parti.netloc, parti.path, urllib.parse.urlencode(query), ""))
@@ -300,7 +303,7 @@ def leggi_json(percorso: Path, predefinito):
 def esegui() -> int:
     adesso = time.time()
     config = json.loads((BASE / "fonti.json").read_text(encoding="utf-8"))
-    archivio = leggi_json(FILE_ARCHIVIO, [])
+    archivio = [a for a in leggi_json(FILE_ARCHIVIO, []) if pulisci_link(a["u"])]
     # Senza archivio non possiamo fidarci di "non è cambiato nulla": riscarichiamo tutto.
     stato = leggi_json(FILE_STATO, {}) if archivio else {}
 
