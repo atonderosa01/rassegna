@@ -1,0 +1,103 @@
+{
+  "testate": [
+    {"testata": "ANSA", "url": "https://www.ansa.it/sito/ansait_rss.xml"},
+    {"testata": "ANSA", "url": "https://www.ansa.it/sito/notizie/economia/economia_rss.xml", "sezione": "Economia e mercati"},
+    {"testata": "ANSA", "url": "https://www.ansa.it/sito/notizie/politica/politica_rss.xml", "sezione": "Politica"},
+    {"testata": "ANSA", "url": "https://www.ansa.it/sito/notizie/cronaca/cronaca_rss.xml", "sezione": "Cronaca"},
+    {"testata": "ANSA", "url": "https://www.ansa.it/sito/notizie/sport/sport_rss.xml", "sezione": "Sport"},
+    {"testata": "ANSA", "url": "https://www.ansa.it/lombardia/notizie/lombardia_rss.xml"},
+    {"testata": "ANSA", "url": "https://www.ansa.it/lazio/notizie/lazio_rss.xml"},
+    {"testata": "la Repubblica", "url": "https://www.repubblica.it/rss/homepage/rss2.0.xml"},
+    {"testata": "la Repubblica", "url": "https://www.repubblica.it/rss/economia/rss2.0.xml", "sezione": "Economia e mercati"},
+    {"testata": "la Repubblica", "url": "https://www.repubblica.it/rss/politica/rss2.0.xml", "sezione": "Politica"},
+    {"testata": "la Repubblica", "url": "https://www.repubblica.it/rss/cronaca/rss2.0.xml", "sezione": "Cronaca"},
+    {"testata": "Il Sole 24 Ore", "url": "https://www.ilsole24ore.com/rss/italia.xml"},
+    {"testata": "Il Sole 24 Ore", "url": "https://www.ilsole24ore.com/rss/economia.xml", "sezione": "Economia e mercati"},
+    {"testata": "Il Sole 24 Ore", "url": "https://www.ilsole24ore.com/rss/finanza.xml", "sezione": "Economia e mercati"},
+    {"testata": "Il Sole 24 Ore", "url": "https://www.ilsole24ore.com/rss/norme-e-tributi.xml", "sezione": "Fisco e tasse"},
+    {"testata": "Il Sole 24 Ore", "url": "https://www.ilsole24ore.com/rss/mondo.xml", "sezione": "Esteri"},
+    {"testata": "Il Messaggero", "url": "https://www.ilmessaggero.it/rss/home.xml"},
+    {"testata": "Il Messaggero", "url": "https://www.ilmessaggero.it/rss/economia.xml", "sezione": "Economia e mercati"},
+    {"testata": "Il Messaggero", "url": "https://www.ilmessaggero.it/rss/roma.xml", "sezione": "Roma"},
+    {"testata": "RaiNews", "url": "https://www.rainews.it/rss/tutti"},
+    {"testata": "RaiNews", "url": "https://www.rainews.it/rss/politica", "sezione": "Politica"},
+    {"testata": "Sky TG24", "url": "https://tg24.sky.it/rss/tg24.xml"},
+    {"testata": "Sky TG24", "url": "https://tg24.sky.it/rss/tg24_flipboard.economia.xml", "sezione": "Economia e mercati"},
+    {"testata": "Adnkronos", "url": "https://www.adnkronos.com/RSS_PrimaPagina.xml"},
+    {"testata": "Adnkronos", "url": "https://www.adnkronos.com/RSS_Economia.xml", "sezione": "Economia e mercati"},
+    {"testata": "AGI", "url": "https://www.agi.it/rss"},
+    {"testata": "TGCom24", "url": "https://www.tgcom24.mediaset.it/rss/homepage.xml"},
+    {"testata": "Il Fatto Quotidiano", "url": "https://www.ilfattoquotidiano.it/feed/"},
+    {"testata": "Il Mattino", "url": "https://www.ilmattino.it/rss/home.xml"},
+    {"testata": "Il Gazzettino", "url": "https://www.ilgazzettino.it/rss/home.xml"},
+    {"testata": "QN", "url": "https://www.quotidiano.net/rss"},
+    {"testata": "Libero", "url": "https://www.liberoquotidiano.it/rss.xml"},
+    {"testata": "Domani", "url": "https://www.editorialedomani.it/rss"},
+    {"testata": "Il Manifesto", "url": "https://cms.ilmanifesto.it/feed"},
+    {"testata": "Open", "url": "https://www.open.online/feed/"},
+    {"testata": "Today", "url": "https://www.today.it/rss"},
+    {"testata": "Il Sussidiario", "url": "https://www.ilsussidiario.net/feed/"},
+    {"testata": "QuiFinanza", "url": "https://quifinanza.it/feed/", "sezione": "Economia e mercati"},
+    {"testata": "Investire Oggi", "url": "https://www.investireoggi.it/feed/", "sezione": "Economia e mercati"},
+    {"testata": "MilanoToday", "url": "https://www.milanotoday.it/rss", "sezione": "Milano"},
+    {"testata": "RomaToday", "url": "https://www.romatoday.it/rss", "sezione": "Roma"},
+    {"testata": "Corriere dello Sport", "url": "https://www.corrieredellosport.it/rss/home", "sezione": "Sport"},
+    {"testata": "Tuttosport", "url": "https://www.tuttosport.com/rss/home", "sezione": "Sport"},
+    {"testata": "Calcio e Finanza", "url": "https://www.calcioefinanza.it/feed/", "sezione": "Sport"},
+
+    {"testata": "Corriere della Sera", "url": "https://www.corriere.it/feed-hp/homepage.xml"},
+    {"testata": "Corriere della Sera", "url": "https://www.corriere.it/dynamic-feed/rss/section/Economia.xml", "sezione": "Economia e mercati"},
+    {"testata": "Corriere della Sera", "url": "https://www.corriere.it/dynamic-feed/rss/section/Politica.xml", "sezione": "Politica"},
+    {"testata": "Corriere della Sera", "url": "https://www.corriere.it/dynamic-feed/rss/section/Cronache.xml", "sezione": "Cronaca"},
+    {"testata": "Corriere della Sera", "url": "https://www.corriere.it/dynamic-feed/rss/section/Esteri.xml", "sezione": "Esteri"},
+    {"testata": "Corriere della Sera", "url": "https://www.corriere.it/dynamic-feed/rss/section/Sport.xml", "sezione": "Sport"},
+    {"testata": "Corriere della Sera", "url": "https://www.corriere.it/dynamic-feed/rss/section/Milano.xml", "sezione": "Milano"},
+    {"testata": "Corriere della Sera", "url": "https://www.corriere.it/dynamic-feed/rss/section/Roma.xml", "sezione": "Roma"},
+    {"testata": "La Stampa", "url": "https://www.lastampa.it/rss/copertina.xml"},
+    {"testata": "La Gazzetta dello Sport", "url": "https://www.gazzetta.it/dynamic-feed/rss/section/last.xml", "sezione": "Sport"},
+
+    {"testata": "Il Post", "google": "site:ilpost.it when:2d"},
+    {"testata": "il Giornale", "google": "site:ilgiornale.it when:2d"},
+    {"testata": "Fanpage", "google": "site:fanpage.it when:2d"},
+    {"testata": "HuffPost Italia", "google": "site:huffingtonpost.it when:2d"},
+    {"testata": "Il Foglio", "google": "site:ilfoglio.it when:2d"},
+    {"testata": "Avvenire", "google": "site:avvenire.it when:2d"},
+    {"testata": "Milano Finanza", "google": "site:milanofinanza.it when:2d", "sezione": "Economia e mercati"},
+    {"testata": "FiscoOggi", "google": "site:fiscooggi.it when:7d", "sezione": "Fisco e tasse"}
+  ],
+
+  "ricerche_per_tema": [
+    {"tema": "Fisco e tasse", "google": "(taglio imposte OR taglio tasse OR manovra OR \"regime forfettario\" OR \"flat tax\" OR Irpef OR \"regimi fiscali\") when:3d"},
+    {"tema": "Costo della vita", "google": "(\"caro vita\" OR carovita OR \"costo della vita\" OR \"qualità della vita\") (Milano OR Roma OR Italia) when:7d"},
+    {"tema": "Stadi e grandi opere", "google": "(\"San Siro\" OR \"Generali Stadium\" OR \"nuovo stadio\" OR \"Ponte sullo Stretto\") when:7d"},
+    {"tema": "Casa e immobili", "google": "(mercato immobiliare OR \"prezzi delle case\" OR mutui OR affitti) (Milano OR Roma OR Italia) when:7d"}
+  ],
+
+  "temi": {
+    "Fisco e tasse": ["imposta", "imposte", "tassa", "tasse", "tassazione", "fisco", "fiscale", "fiscali", "irpef", "ires", "irap", "iva", "imu", "flat tax", "forfettario", "forfettari", "regime forfettario", "manovra", "legge di bilancio", "cuneo fiscale", "agenzia delle entrate", "rottamazione", "condono", "cartelle esattoriali", "detrazioni", "detrazione", "partite iva", "partita iva", "tax credit"],
+    "Costo della vita": ["caro vita", "carovita", "costo della vita", "qualita della vita", "caro affitti", "caro voli", "caro prezzi", "caro spesa", "caro benzina", "caro bollette", "bollette", "inflazione", "potere d acquisto", "media nazionale", "aumento dei prezzi", "aumenti dei prezzi", "rincari", "rincaro"],
+    "Casa e immobili": ["mercato immobiliare", "immobiliare", "immobili", "prezzi delle case", "prezzi case", "mutuo", "mutui", "affitti", "affitto", "compravendite", "piano casa", "edilizia"],
+    "Lavoro e pensioni": ["pensione", "pensioni", "pensionati", "inps", "occupazione", "disoccupazione", "contratto nazionale", "sciopero", "licenziamenti", "assunzioni", "stipendi", "salari"],
+    "Economia e mercati": ["piazza affari", "borsa", "borse", "spread", "pil", "bce", "banche", "banca", "dazi", "ftse mib", "bilancio", "economia"],
+    "Politica": ["governo", "meloni", "schlein", "salvini", "tajani", "parlamento", "senato", "camera dei deputati", "quirinale", "mattarella", "ministro", "referendum", "campo largo", "elezioni", "regionali"],
+    "Milano": ["milano", "milanese", "milanesi"],
+    "Roma": ["roma", "romano", "romana", "campidoglio", "gualtieri"],
+    "Stadi e grandi opere": ["san siro", "generali stadium", "nuovo stadio", "stadio della roma", "stadio pietralata", "ponte sullo stretto", "grandi opere", "alta velocita"],
+    "Esteri": ["trump", "putin", "zelensky", "netanyahu", "ucraina", "gaza", "israele", "iran", "casa bianca", "unione europea"],
+    "Sport": ["serie a", "champions", "europa league", "formula 1", "f1", "motogp", "juventus", "juve", "inter", "milan", "atalanta", "fiorentina", "pagelle", "gol", "calciomercato", "sinner", "tennis", "gp", "atletica", "maratona", "ciclismo", "basket", "nba", "pilota", "derby", "mondiali"]
+  },
+
+  "temi_esclusioni": {
+    "Stadi e grandi opere": ["derby", "gol", "pagelle", "partita", "partite", "vittoria", "kaka", "nazionale", "tifosi del milan", "tifosi dell inter", "spettacolo"]
+  },
+
+  "temi_anche_nello_sport": ["Sport", "Stadi e grandi opere"],
+
+  "scarta_titoli": [
+    "\\b(put|call)\\s+\\d",
+    "^tg\\d\\b",
+    "^tgr\\b",
+    "\\boroscopo\\b",
+    "\\bcodice sconto\\b"
+  ]
+}
