@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Rassegna</title>
+<meta name="robots" content="noindex">
+<style>
+:root{--bg:#f7f4ee;--card:#fffdf9;--ink:#1c1a17;--soft:#6a645a;--line:#e0d9cc;--accent:#a3262a;--chip:#efe9dd;--visited:#8a8478}
+@media (prefers-color-scheme:dark){:root{--bg:#15140f;--card:#1e1c17;--ink:#ece7dc;--soft:#a39c8e;--line:#35322a;--accent:#e8686b;--chip:#2a2720;--visited:#857f72}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:inherit;text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px}
+header{padding:26px 0 14px;border-bottom:3px double var(--ink)}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+h1{font:700 clamp(34px,7vw,52px)/1 Georgia,"Times New Roman",serif;margin:0;letter-spacing:-.02em}
+.meta{color:var(--soft);font-size:14px}
+.controls{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 0 10px;border-bottom:1px solid var(--line)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+input,select{font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:9px 11px;min-width:0}
+input{flex:1 1 220px}
+select{flex:0 1 auto;max-width:48%}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+@media (min-width:700px){.chips{flex-wrap:wrap;overflow:visible}}
+.chip{flex:none;font:inherit;font-size:14px;color:inherit;background:var(--chip);border:0;border-radius:999px;padding:6px 12px;cursor:pointer;white-space:nowrap}
+.chip small{color:var(--soft);margin-left:3px;font-size:12px}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.chip[aria-pressed=true] small{color:inherit;opacity:.7}
+h2{font:700 13px/1.2 system-ui,sans-serif;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);margin:26px 0 10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.title{font:600 18px/1.28 Georgia,"Times New Roman",serif;display:block;overflow-wrap:anywhere}
+.card .title{font-size:19px}
+a.title:visited,.read .title{color:var(--visited)}
+.item{padding:13px 0;border-bottom:1px solid var(--line)}
+.info{color:var(--soft);font-size:13.5px;margin-top:5px;display:flex;flex-wrap:wrap;gap:3px 10px;align-items:center}
+.src{font-weight:600;color:var(--ink)}
+.new{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;margin-right:6px;vertical-align:2px}
+details.more summary{cursor:pointer;color:var(--accent);list-style:none;font-weight:600}
+details.more summary::-webkit-details-marker{display:none}
+details.more ul{list-style:none;margin:8px 0 0;padding:0 0 0 12px;border-left:2px solid var(--line);width:100%}
+details.more li{padding:5px 0;font-size:14.5px;color:var(--ink)}
+details.more li b{font-weight:600;color:var(--soft)}
+.more-wrap{flex-basis:100%}
+.btn{display:block;margin:20px auto 34px;font:inherit;color:inherit;background:var(--chip);border:0;border-radius:8px;padding:11px 20px;cursor:pointer}
+.empty{padding:40px 0;color:var(--soft);text-align:center}
+.alert{background:#a3262a;color:#fff;padding:9px 14px;border-radius:8px;margin-top:12px;font-size:14px}
+footer{border-top:1px solid var(--line);padding:18px 0 40px;color:var(--soft);font-size:13.5px}
+footer table{border-collapse:collapse;width:100%;margin-top:10px}
+footer td{padding:3px 8px 3px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+.bad{color:var(--accent);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="top">
+      <h1>La Rassegna</h1>
+      <div class="meta" id="meta" aria-live="polite"></div>
+    </div>
+    <div id="alert"></div>
+  </header>
+  <div class="controls">
+    <div class="row">
+      <input id="q" type="search" placeholder="Cerca: San Siro, Irpef, forfettario…" aria-label="Cerca tra le notizie">
+      <select id="testata" aria-label="Filtra per testata"></select>
+      <select id="periodo" aria-label="Filtra per periodo">
+        <option value="24">Ultime 24 ore</option>
+        <option value="72">Ultimi 3 giorni</option>
+        <option value="168" selected>Ultimi 7 giorni</option>
+      </select>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="Filtra per tema"></div>
+  </div>
+  <main id="main"></main>
+  <footer>
+    <div>Solo titoli e link: ogni articolo si apre sul sito del giornale che l'ha pubblicato.</div>
+    <details style="margin-top:8px"><summary id="fonti-sum" style="cursor:pointer"></summary><table id="fonti"></table></details>
+  </footer>
+</div>
+<script>
+(function () {
+  "use strict";
+  var PASSO = 60, ORA = 3600, AVVISO_VECCHIO = 3 * ORA;
+  var stato = { tema: "", testata: "", q: "", periodo: 168, mostra: PASSO };
+  var $ = function (id) { return document.getElementById(id); };
+  var dati = null;
+
+  function leggi(chiave, base) { try { var v = localStorage.getItem(chiave); return v ? JSON.parse(v) : base; } catch (e) { return base; } }
+  function salva(chiave, v) { try { localStorage.setItem(chiave, JSON.stringify(v)); } catch (e) {} }
+
+  var letti = new Set(leggi("letti", []));
+  var scorsaVisita = leggi("visita", 0);
+  salva("visita", Math.floor(Date.now() / 1000));
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; });
+  }
+  function link(u) { return /^https?:\/\//i.test(u) ? esc(u) : "#"; }
+  function norm(s) { return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
+  function adesso() { return Date.now() / 1000; }
+
+  function quando(d) {
+    var diff = adesso() - d;
+    if (diff < 60) return "ora";
+    if (diff < ORA) return Math.floor(diff / 60) + " min fa";
+    if (diff < 12 * ORA) return Math.floor(diff / ORA) + " h fa";
+    var data = new Date(d * 1000), oggi = new Date();
+    var ore = data.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+    if (data.toDateString() === oggi.toDateString()) return "oggi " + ore;
+    oggi.setDate(oggi.getDate() - 1);
+    if (data.toDateString() === oggi.toDateString()) return "ieri " + ore;
+    return data.toLocaleDateString("it-IT", { day: "numeric", month: "short" }) + " " + ore;
+  }
+  function giorno(d) {
+    var data = new Date(d * 1000), oggi = new Date();
+    if (data.toDateString() === oggi.toDateString()) return "Oggi";
+    oggi.setDate(oggi.getDate() - 1);
+    if (data.toDateString() === oggi.toDateString()) return "Ieri";
+    return data.toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" });
+  }
+  function testate(s) { var o = new Set(); s.a.forEach(function (a) { o.add(a.s); }); return o; }
+
+  function filtrate(ignoraTema) {
+    var limite = adesso() - stato.periodo * ORA, parole = norm(stato.q).split(/\s+/).filter(Boolean);
+    return dati.storie.filter(function (s) {
+      if (s.a[0].d < limite) return false;
+      if (!ignoraTema && stato.tema && s.k.indexOf(stato.tema) < 0) return false;
+      if (stato.testata && !s.a.some(function (a) { return a.s === stato.testata; })) return false;
+      if (parole.length) {
+        var testo = norm(s.a.map(function (a) { return a.t + " " + a.s; }).join(" "));
+        if (!parole.every(function (p) { return testo.indexOf(p) >= 0; })) return false;
+      }
+      return true;
+    });
+  }
+
+  function principale(s) {
+    if (stato.testata) { for (var i = 0; i < s.a.length; i++) if (s.a[i].s === stato.testata) return s.a[i]; }
+    return s.a[0];
+  }
+
+  function htmlStoria(s, classe) {
+    var capo = principale(s), altri = s.a.filter(function (a) { return a !== capo; });
+    var nuova = scorsaVisita && s.a[0].d > scorsaVisita;
+    var letta = s.a.some(function (a) { return letti.has(a.u); });
+    var n = testate(s).size;
+    var h = '<article class="' + classe + (letta ? " read" : "") + '">';
+    h += '<a class="title" target="_blank" rel="noopener noreferrer" href="' + link(capo.u) + '">' + (nuova ? '<span class="new" title="Nuova dall\'ultima visita"></span>' : "") + esc(capo.t) + "</a>";
+    h += '<div class="info"><span class="src">' + esc(capo.s) + "</span><span>" + quando(capo.d) + "</span>";
+    if (altri.length) {
+      h += '<details class="more more-wrap"><summary>' + (n > 1 ? "Su " + n + " testate" : altri.length + " altri articoli") + " ▾</summary><ul>";
+      altri.forEach(function (a) {
+        h += '<li><b>' + esc(a.s) + '</b> · <a target="_blank" rel="noopener noreferrer" href="' + link(a.u) + '">' + esc(a.t) + "</a></li>";
+      });
+      h += "</ul></details>";
+    }
+    return h + "</div></article>";
+  }
+
+  function disegna() {
+    var main = $("main"), lista = filtrate(false), h = "";
+    var libero = !stato.q && !stato.testata;
+    if (libero) {
+      var limite = adesso() - 36 * ORA;
+      var punti = function (s) { return testate(s).size * Math.exp(-(adesso() - s.a[0].d) / (18 * ORA)); };
+      var top = lista.filter(function (s) { return s.a[0].d > limite && testate(s).size >= 3; })
+        .sort(function (a, b) { return punti(b) - punti(a); }).slice(0, 6);
+      if (top.length) {
+        h += '<h2>Di cui parlano tutti</h2><div class="grid">' + top.map(function (s) { return htmlStoria(s, "card"); }).join("") + "</div>";
+      }
+    }
+    var gruppo = null;
+    lista.slice(0, stato.mostra).forEach(function (s) {
+      var g = giorno(s.a[0].d);
+      if (g !== gruppo) { h += "<h2>" + esc(g) + "</h2>"; gruppo = g; }
+      h += htmlStoria(s, "item");
+    });
+    if (!lista.length) h = '<p class="empty">Nessuna notizia con questi filtri.</p>';
+    if (lista.length > stato.mostra) h += '<button class="btn" id="altre">Mostra altre (' + (lista.length - stato.mostra) + ")</button>";
+    main.innerHTML = h;
+    var b = $("altre");
+    if (b) b.onclick = function () { stato.mostra += PASSO; disegna(); };
+  }
+
+  function disegnaChip() {
+    var base = filtrate(true), conta = {};
+    base.forEach(function (s) { s.k.forEach(function (k) { conta[k] = (conta[k] || 0) + 1; }); });
+    var voci = [["", "Tutte", base.length]].concat(dati.temi.map(function (t) { return [t, t, conta[t] || 0]; }));
+    $("chips").innerHTML = voci.map(function (v) {
+      return '<button class="chip" data-t="' + esc(v[0]) + '" aria-pressed="' + (stato.tema === v[0]) + '">' + esc(v[1]) + " <small>" + v[2] + "</small></button>";
+    }).join("");
+  }
+
+  function disegnaTestate() {
+    var nomi = new Set();
+    dati.storie.forEach(function (s) { s.a.forEach(function (a) { nomi.add(a.s); }); });
+    var ordinate = Array.from(nomi).sort(function (a, b) { return a.localeCompare(b, "it"); });
+    $("testata").innerHTML = '<option value="">Tutte le testate</option>' + ordinate.map(function (n) {
+      return '<option value="' + esc(n) + '"' + (n === stato.testata ? " selected" : "") + ">" + esc(n) + "</option>";
+    }).join("");
+  }
+
+  function disegnaStato() {
+    $("meta").textContent = "Aggiornato " + quando(dati.aggiornato);
+    var vecchio = adesso() - dati.aggiornato > AVVISO_VECCHIO;
+    $("alert").innerHTML = vecchio ? '<div class="alert">Attenzione: l\'ultimo aggiornamento risale a ' + esc(quando(dati.aggiornato)) + ". Le notizie potrebbero non essere le più recenti.</div>" : "";
+    var ok = dati.fonti.filter(function (f) { return f.ok && !f.ferma; }).length;
+    $("fonti-sum").textContent = "Fonti attive: " + ok + " su " + dati.fonti.length;
+    $("fonti").innerHTML = dati.fonti.map(function (f) {
+      var esito = !f.ok ? '<span class="bad">Errore: ' + esc(f.errore) + "</span>" : f.ferma ? '<span class="bad">Ferma da giorni</span>' : "OK";
+      return "<tr><td>" + esc(f.nome) + "</td><td>" + esito + "</td><td>" + (f.ultimo ? esc(quando(f.ultimo)) : "") + "</td></tr>";
+    }).join("");
+  }
+
+  function tutto() { disegnaStato(); disegnaTestate(); disegnaChip(); disegna(); }
+
+  function carica() {
+    var tag = document.createElement("script");
+    tag.src = "dati.js?t=" + Date.now();
+    tag.onload = function () {
+      tag.remove();
+      if (!window.NOTIZIE) return;
+      if (!dati || window.NOTIZIE.aggiornato !== dati.aggiornato) { dati = window.NOTIZIE; tutto(); }
+      else disegnaStato();
+    };
+    tag.onerror = function () {
+      tag.remove();
+      if (!dati) $("main").innerHTML = '<p class="empty">Notizie non ancora disponibili: riprova tra qualche minuto.</p>';
+    };
+    document.head.appendChild(tag);
+  }
+
+  var attesa;
+  $("q").addEventListener("input", function (e) {
+    clearTimeout(attesa);
+    attesa = setTimeout(function () { stato.q = e.target.value; stato.mostra = PASSO; disegnaChip(); disegna(); }, 150);
+  });
+  $("testata").addEventListener("change", function (e) { stato.testata = e.target.value; stato.mostra = PASSO; disegnaChip(); disegna(); });
+  $("periodo").addEventListener("change", function (e) { stato.periodo = +e.target.value; stato.mostra = PASSO; disegnaChip(); disegna(); });
+  $("chips").addEventListener("click", function (e) {
+    var b = e.target.closest(".chip");
+    if (!b) return;
+    stato.tema = b.dataset.t; stato.mostra = PASSO; disegnaChip(); disegna();
+  });
+  $("main").addEventListener("click", function (e) {
+    var a = e.target.closest("a[href]");
+    if (!a) return;
+    letti.add(a.getAttribute("href"));
+    salva("letti", Array.from(letti).slice(-3000));
+    var art = a.closest("article");
+    if (art) art.classList.add("read");
+  });
+
+  carica();
+  setInterval(carica, 5 * 60 * 1000);
+  setInterval(function () { if (dati) disegnaStato(); }, 60 * 1000);
+})();
+</script>
+</body>
+</html>
