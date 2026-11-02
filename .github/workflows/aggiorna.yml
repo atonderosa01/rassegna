@@ -40,8 +40,8 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: dati
-          key: dati-${{ github.run_id }}
-          restore-keys: dati-
+          key: dati-v2-${{ github.run_id }}
+          restore-keys: dati-v2-
 
       - name: Raccogli le notizie
         run: python aggiorna.py
@@ -50,7 +50,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: dati
-          key: dati-${{ github.run_id }}
+          key: dati-v2-${{ github.run_id }}
 
       - uses: actions/upload-pages-artifact@v3
         with:
