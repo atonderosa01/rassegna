@@ -17,7 +17,7 @@ a:hover{text-decoration:underline}
 header{padding:26px 0 14px;border-bottom:3px double var(--ink)}
 .top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
 h1{font:700 clamp(34px,7vw,52px)/1 Georgia,"Times New Roman",serif;margin:0;letter-spacing:-.02em}
-.meta{color:var(--soft);font-size:14px}
+.meta{color:var(--soft);font-size:14px;margin-bottom:8px}
 .controls{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 0 10px;border-bottom:1px solid var(--line)}
 .row{display:flex;gap:8px;flex-wrap:wrap}
 input,select{font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:9px 11px;min-width:0}
@@ -60,11 +60,11 @@ footer td{padding:3px 8px 3px 0;border-bottom:1px solid var(--line);overflow-wra
   <header>
     <div class="top">
       <h1>La Rassegna</h1>
-      <div class="meta" id="meta" aria-live="polite"></div>
     </div>
     <div id="alert"></div>
   </header>
   <div class="controls">
+    <div class="meta" id="meta"></div>
     <div class="row">
       <input id="q" type="search" placeholder="Cerca: San Siro, Irpef, forfettario…" aria-label="Cerca tra le notizie">
       <select id="testata" aria-label="Filtra per testata"></select>
@@ -104,17 +104,18 @@ footer td{padding:3px 8px 3px 0;border-bottom:1px solid var(--line);overflow-wra
   function norm(s) { return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
   function adesso() { return Date.now() / 1000; }
 
-  function quando(d) {
-    var diff = adesso() - d;
-    if (diff < 60) return "ora";
-    if (diff < ORA) return Math.floor(diff / 60) + " min fa";
-    if (diff < 12 * ORA) return Math.floor(diff / ORA) + " h fa";
-    var data = new Date(d * 1000), oggi = new Date();
-    var ore = data.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
-    if (data.toDateString() === oggi.toDateString()) return "oggi " + ore;
-    oggi.setDate(oggi.getDate() - 1);
-    if (data.toDateString() === oggi.toDateString()) return "ieri " + ore;
-    return data.toLocaleDateString("it-IT", { day: "numeric", month: "short" }) + " " + ore;
+  function pubblicato(d) {
+    var data = new Date(d * 1000);
+    return data.toLocaleDateString("it-IT", { day: "numeric", month: "short", year: "numeric" }) + ", " + data.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+  }
+  function dataArticolo(a) { return a.nd ? "data non indicata" : pubblicato(a.d); }
+  function trascorso(d) {
+    var minuti = Math.floor((adesso() - d) / 60);
+    if (minuti < 1) return "meno di un minuto fa";
+    if (minuti < 60) return minuti + (minuti === 1 ? " minuto fa" : " minuti fa");
+    var ore = Math.floor(minuti / 60);
+    if (ore < 48) return ore + (ore === 1 ? " ora fa" : " ore fa");
+    return Math.floor(ore / 24) + " giorni fa";
   }
   function giorno(d) {
     var data = new Date(d * 1000), oggi = new Date();
@@ -151,11 +152,11 @@ footer td{padding:3px 8px 3px 0;border-bottom:1px solid var(--line);overflow-wra
     var n = testate(s).size;
     var h = '<article class="' + classe + (letta ? " read" : "") + '">';
     h += '<a class="title" target="_blank" rel="noopener noreferrer" href="' + link(capo.u) + '">' + (nuova ? '<span class="new" title="Nuova dall\'ultima visita"></span>' : "") + esc(capo.t) + "</a>";
-    h += '<div class="info"><span class="src">' + esc(capo.s) + "</span><span>" + quando(capo.d) + "</span>";
+    h += '<div class="info"><span class="src">' + esc(capo.s) + "</span><span>" + esc(dataArticolo(capo)) + "</span>";
     if (altri.length) {
       h += '<details class="more more-wrap"><summary>' + (n > 1 ? "Su " + n + " testate" : altri.length + " altri articoli") + " ▾</summary><ul>";
       altri.forEach(function (a) {
-        h += '<li><b>' + esc(a.s) + '</b> · <a target="_blank" rel="noopener noreferrer" href="' + link(a.u) + '">' + esc(a.t) + "</a></li>";
+        h += '<li><b>' + esc(a.s) + " · " + esc(dataArticolo(a)) + '</b><br><a target="_blank" rel="noopener noreferrer" href="' + link(a.u) + '">' + esc(a.t) + "</a></li>";
       });
       h += "</ul></details>";
     }
@@ -206,14 +207,14 @@ footer td{padding:3px 8px 3px 0;border-bottom:1px solid var(--line);overflow-wra
   }
 
   function disegnaStato() {
-    $("meta").textContent = "Aggiornato " + quando(dati.aggiornato);
+    $("meta").textContent = "Sito aggiornato " + trascorso(dati.aggiornato);
     var vecchio = adesso() - dati.aggiornato > AVVISO_VECCHIO;
-    $("alert").innerHTML = vecchio ? '<div class="alert">Attenzione: l\'ultimo aggiornamento risale a ' + esc(quando(dati.aggiornato)) + ". Le notizie potrebbero non essere le più recenti.</div>" : "";
+    $("alert").innerHTML = vecchio ? '<div class="alert">Attenzione: l\'ultimo aggiornamento è di ' + esc(trascorso(dati.aggiornato)) + ". Le notizie potrebbero non essere le più recenti.</div>" : "";
     var ok = dati.fonti.filter(function (f) { return f.ok && !f.ferma; }).length;
     $("fonti-sum").textContent = "Fonti attive: " + ok + " su " + dati.fonti.length;
     $("fonti").innerHTML = dati.fonti.map(function (f) {
       var esito = !f.ok ? '<span class="bad">Errore: ' + esc(f.errore) + "</span>" : f.ferma ? '<span class="bad">Ferma da giorni</span>' : "OK";
-      return "<tr><td>" + esc(f.nome) + "</td><td>" + esito + "</td><td>" + (f.ultimo ? esc(quando(f.ultimo)) : "") + "</td></tr>";
+      return "<tr><td>" + esc(f.nome) + "</td><td>" + esito + "</td><td>" + (f.ultimo ? esc(pubblicato(f.ultimo)) : "") + "</td></tr>";
     }).join("");
   }
 
