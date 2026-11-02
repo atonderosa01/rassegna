@@ -50,7 +50,9 @@ STOPWORD = set(
 )
 PARAMETRI_TRACCIAMENTO = re.compile(r"^(utm_.*|ref|refresh_ce|rss|fbclid|gclid|cmpid|xtor)$", re.I)
 MESI = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"]
-DATA_ITALIANA = re.compile(rf"\b(\d{{1,2}}) ({'|'.join(MESI)})[a-z]* (\d{{4}}) (\d{{2}}) (\d{{2}})\b")
+DATA_ITALIANA = re.compile(
+    rf"\b(\d{{1,2}})\s+({'|'.join(MESI)})[a-z]*\s+(\d{{4}})\s+(\d{{2}}):(\d{{2}})(?::(\d{{2}}))?\s*([+-]\d{{4}})?", re.I
+)
 
 log = logging.getLogger("rassegna")
 
@@ -87,27 +89,27 @@ def pulisci_link(link: str) -> str | None:
 
 
 def data_italiana(testo: str) -> float | None:
-    """Sky TG24 scrive le date in italiano ("mar, 03 mag 2026 ..."), che feedparser non sempre capisce."""
-    trovata = DATA_ITALIANA.search(normalizza(testo or ""))
+    """Sky TG24 e Messaggero scrivono "lun, 02 nov 2026 01:00:05 +0100", che feedparser non capisce."""
+    trovata = DATA_ITALIANA.search(testo or "")
     if not trovata:
         return None
-    giorno, mese, anno, ore, minuti = trovata.groups()
-    return float(calendar.timegm((int(anno), MESI.index(mese) + 1, int(giorno), int(ore), int(minuti), 0)))
+    giorno, mese, anno, ore, minuti, secondi, fuso = trovata.groups()
+    ts = calendar.timegm((int(anno), MESI.index(mese.lower()) + 1, int(giorno), int(ore), int(minuti), int(secondi or 0)))
+    if fuso:
+        scarto = int(fuso[1:3]) * 3600 + int(fuso[3:5]) * 60
+        ts += -scarto if fuso[0] == "+" else scarto
+    return float(ts)
 
 
-def data_articolo(voce, adesso: float) -> float:
-    """Data del feed; se manca o è nel futuro (succede) vale il momento in cui l'abbiamo visto."""
-    ts = None
+def data_articolo(voce) -> float | None:
+    """Data di pubblicazione dichiarata dal feed, None se non c'è."""
     for campo in ("published_parsed", "updated_parsed"):
         if voce.get(campo):
             try:
-                ts = float(calendar.timegm(voce[campo]))
-                break
+                return float(calendar.timegm(voce[campo]))
             except (ValueError, OverflowError):
                 continue
-    if ts is None:
-        ts = data_italiana(voce.get("published") or voce.get("updated"))
-    return adesso if ts is None or ts > adesso + 600 else ts
+    return data_italiana(voce.get("published") or voce.get("updated"))
 
 
 def assegna_temi(titolo: str, sezione: str | None, config: dict) -> list[str]:
@@ -209,15 +211,21 @@ def leggi_fonte(fonte: dict, stato_tutti: dict, config: dict, adesso: float) -> 
         link = pulisci_link(voce.get("link"))
         if not titolo or not link or any(r.search(normalizza(titolo)) for r in scarta):
             continue
-        data = data_articolo(voce, adesso)
-        stato["ultimo"] = max(stato.get("ultimo") or 0, data)
-        if data < limite:
+        data = data_articolo(voce)
+        # Articolo programmato: comparirà al prossimo giro utile, con la sua data vera.
+        if data and data > adesso + 600:
+            continue
+        stato["ultimo"] = max(stato.get("ultimo") or 0, data or adesso)
+        if data and data < limite:
             continue
         temi = assegna_temi(titolo, fonte.get("sezione"), config)
         # La ricerca Google trova anche articoli che citano il tema di sfuggita: serve nel titolo.
         if fonte.get("tema") and fonte["tema"] not in temi:
             continue
-        articoli.append({"t": titolo, "u": link, "s": testata or nome_testata(fonte_voce, note), "d": data, "k": temi})
+        articolo = {"t": titolo, "u": link, "s": testata or nome_testata(fonte_voce, note), "d": data or adesso, "k": temi}
+        if not data:
+            articolo["nd"] = True  # senza data: serve solo a ordinarlo, sul sito non va mostrata
+        articoli.append(articolo)
     esito["ultimo"] = stato.get("ultimo")
     esito["nuovi"] = len(articoli)
     return articoli, esito
@@ -235,6 +243,9 @@ def unisci_in_archivio(archivio: list[dict], nuovi: list[dict], limite: float) -
             per_chiave[chiave] = art
             continue
         esistente["k"] = sorted(set(esistente["k"]) | set(art["k"]))
+        if not art.get("nd"):
+            esistente["d"] = art["d"]
+            esistente.pop("nd", None)
         if "news.google.com" in esistente["u"] and "news.google.com" not in art["u"]:
             esistente["u"] = art["u"]
     return sorted(per_chiave.values(), key=lambda a: a["d"])
@@ -328,7 +339,7 @@ def esegui() -> int:
     storie = raggruppa_storie(archivio)
     storie.sort(key=lambda s: s[0]["d"], reverse=True)
 
-    per_sito = [{"a": [{"t": a["t"], "u": a["u"], "s": a["s"], "d": int(a["d"])} for a in s],
+    per_sito = [{"a": [{"t": a["t"], "u": a["u"], "s": a["s"], "d": int(a["d"]), **({"nd": 1} if a.get("nd") else {})} for a in s],
                  "k": temi_della_storia(s)} for s in storie]
     fonti_sito = []
     for e in sorted(esiti, key=lambda e: (e["ok"], e["nome"].lower())):
