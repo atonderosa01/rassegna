@@ -1,0 +1,66 @@
+name: Aggiorna notizie
+
+on:
+  schedule:
+    - cron: "7,37 * * * *"
+    # Una volta al giorno: GitHub spegne i cron dei repository senza attività per 60 giorni.
+    - cron: "3 4 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  actions: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: aggiorna-notizie
+  cancel-in-progress: false
+
+jobs:
+  aggiorna:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.pubblica.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Recupera l'archivio del giro precedente
+        uses: actions/cache/restore@v4
+        with:
+          path: dati
+          key: dati-${{ github.run_id }}
+          restore-keys: dati-
+
+      - name: Raccogli le notizie
+        run: python aggiorna.py
+
+      - name: Salva l'archivio
+        uses: actions/cache/save@v4
+        with:
+          path: dati
+          key: dati-${{ github.run_id }}
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: sito
+
+      - id: pubblica
+        uses: actions/deploy-pages@v4
+
+      - name: Mantieni attivo il cron
+        if: github.event.schedule == '3 4 * * *'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/aggiorna.yml/enable"
